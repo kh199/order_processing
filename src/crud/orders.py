@@ -1,7 +1,7 @@
 from src.crud.base import DBBase, ModelType
-from src.integrations.exceptions import ObjectNotFoundExceptionError
 from src.models.models import Orders
 from src.schemas.orders import OrderOut
+from src.tools.exceptions import ObjectNotFoundExceptionError
 
 
 class OrdersCRUD(DBBase):
@@ -15,4 +15,4 @@ class OrdersCRUD(DBBase):
         if not order_db:
             raise ObjectNotFoundExceptionError()
         await self.update(obj_id=order_db.id, obj_in={"status": status})
-        return OrderOut.model_validate(order_db)
+        return order_db

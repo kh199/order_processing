@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientResponseError
 from loguru import logger
 
-from src.integrations.exceptions import (
+from src.tools.exceptions import (
     BadRequestExceptionError,
     ClientConnectionError,
     ObjectNotFoundExceptionError,

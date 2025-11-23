@@ -11,28 +11,28 @@ class BaseConfig(BaseSettings):
 class AppSettings(BaseConfig):
     app_title: str = "order_processing"
     app_host: str = "0.0.0.0"
-    app_port: int = 8001
+    app_port: int
     app_log_level: str = "info"
-    app_version: str = "dev"
-    debug: bool = True
     bot_token: str
-    chat_id: int
     database_url: str = Field(
-        "postgresql+asyncpg://postgres:postgres@db_order_processing:5432/postgres",
+        "postgresql+asyncpg://postgres:postgres@order_processing_db:5432/postgres",
         env="DATABASE_URL",
     )
+    rabbitmq_host: str
 
 
 class IntegrationsURLs(BaseConfig):
     telegram_api: AnyHttpUrl = Field("https://api.telegram.org")
 
 
-class TaskSettings(BaseSettings):
-    pass
+class QueueSettings(BaseSettings):
+    create_queue: str = "create_queue"
+    process_queue: str = "process_queue"
+    send_message_queue: str = "send_message_queue"
 
 
-settings, apm_config, integrations_urls = (
+settings, queue_config, integrations_urls = (
     AppSettings(),
-    TaskSettings(),
+    QueueSettings(),
     IntegrationsURLs(),
 )

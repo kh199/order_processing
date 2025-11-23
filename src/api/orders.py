@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status
 
-from src.crud.orders import OrdersCRUD
-from src.schemas.orders import CreateOrder, OrderOut
+from src.core.config import queue_config
+from src.queue.producer import producer
+from src.schemas.orders import CreateOrder
 from src.tools.status_types import StatusTypes
 
 router = APIRouter(prefix="/orders", tags=["Заказы"])
@@ -11,13 +12,11 @@ router = APIRouter(prefix="/orders", tags=["Заказы"])
     "/create",
     summary="Создать заказ",
     status_code=status.HTTP_201_CREATED,
-    response_model=OrderOut,
 )
 async def create_order(
     order: CreateOrder,
-) -> OrderOut:
-    async with OrdersCRUD() as crud:
-        return await crud.create(db_obj=order)
+):
+    producer(queue=queue_config.create_queue, body=order.model_dump())
 
 
 @router.post(
@@ -30,7 +29,7 @@ async def change_order_status(
     user_id: int,
     status: StatusTypes,
 ):
-    async with OrdersCRUD() as crud:
-        return await crud.update_order_status(
-            user_id=user_id, order_id=order_id, status=status
-        )
+    producer(
+        queue=queue_config.process_queue,
+        body={"order_id": order_id, "user_id": user_id, "status": status},
+    )
